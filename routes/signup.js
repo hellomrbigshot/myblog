@@ -18,7 +18,7 @@ router.post('/', checkNotLogin, (req, res, next) => {
 	const gender = req.fields.gender
 	const bio = req.fields.bio
 	const avatar = req.files.avatar.path.split(path.sep).pop()
-	const password = req.fields.password
+	let password = req.fields.password
 	const repassword = req.fields.repassword
 
 	// 校验参数
@@ -64,7 +64,7 @@ router.post('/', checkNotLogin, (req, res, next) => {
 	UserModel.create(user)
 		.then( result => {
 			// 此 user 是插入 mongodb 后的值，包含 _id
-			user = result.ops[o]
+			user = result.ops[0]
 			// 删除密码这种敏感信息，将用户信息存入 session
 			delete user.password
 			req.session.user = user
