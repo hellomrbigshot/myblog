@@ -62,22 +62,91 @@ router.get('/create', checkLogin, (req, res, next) => {
 
 // GET /posts/:postId 单独一篇的文章页
 router.get('/:postId', (req, res, next) => {
-	res.send(req.flash());
+	const postId = req.params.postId
+
+	Promise.all([
+		PostModel.getPostById(postId), // 获取文章信息
+		PostModel.incPv(postId) // pv 加 1
+	])
+		.then(result => {
+			const post = result[0]
+			if (!post) {
+				throw new Error('该文章不存在')
+			}
+
+			res.render('post', {
+				post
+			})
+		})
+		.catch(next)
 })
 
 // GET /posts/:postId/edit 更新文章页
 router.get('/:postId/edit', checkLogin, (req, res, next) => {
-	res.send(req.flash());
+	const postId = req.params.postId
+	const author = req.session.user._id
+
+	PostModel.getRawPostById(postId)
+		.then(post => {
+			if (!post) {
+				throw new Error('该文章不存在')
+			}
+			if (author.toString() !== post.author._id.toString()) {
+				throw new Error('没有权限')
+			}
+			res.render('edit', {
+				post
+			})
+			.catch(next)
+		})
 })
 
 // POST /posts/:postId/edit 更新一篇文章
 router.post('/:postId/edit', checkLogin, (req, res, next) => {
-	res.send(req.flash());
+	const postId = req.params.postId
+	const author = req.session.user._id
+	const title = req.fields.title
+	const content = req.fields.content
+
+	PostModel.getRowPostById(postId)
+		.then(post => {
+			if (!post) {
+				throw new error('文章不存在')
+			}
+			if (post.author._id.toString() !=== author.toString()) {
+				throw new Error('没有权限')
+			}
+			PostModel.updatePostById(postId, { title: title, content: content })
+				.then(() => {
+					req.flash('success', '编辑文章成功')
+					// 编辑成功后跳转到上一页
+					res.redirect(`/posts/${postId}`)
+				})
+				.catch(next)
+		})
 })
 
 // GET /posts/:postId/remove 删除一篇文章
 router.get('/:postId/remove', checkLogin, (req, res, next) => {
-	res.send(req.flash());
+	const postId = req.params.postId
+	const author= req.session.user._id
+
+	PostModel.getRawPostById(postId)
+		.then(post => {
+			if (!post) {
+				throw new Error('文章不存在')
+			}
+			if (post.author._id.toString() !== author.toString()) {
+				throw new Error('没有权限')
+			}
+			PostModel.delPostById(postId)
+				.then(() => {
+					req.flash('success', '删除文章成功')
+					// 删除成功后跳转到主页
+					res.redirect('posts')
+				})
+				.catch(next)
+		})
 })
 
 // POST /posts/:postId/comment 创建一条留言
