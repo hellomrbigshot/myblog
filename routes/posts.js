@@ -113,7 +113,7 @@ router.post('/:postId/edit', checkLogin, (req, res, next) => {
 			if (!post) {
 				throw new error('文章不存在')
 			}
-			if (post.author._id.toString() !=== author.toString()) {
+			if (post.author._id.toString() !== author.toString()) {
 				throw new Error('没有权限')
 			}
 			PostModel.updatePostById(postId, { title: title, content: content })
