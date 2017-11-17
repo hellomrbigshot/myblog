@@ -143,7 +143,7 @@ router.get('/:postId/remove', checkLogin, (req, res, next) => {
 				.then(() => {
 					req.flash('success', '删除文章成功')
 					// 删除成功后跳转到主页
-					res.redirect('posts')
+					res.redirect('/posts')
 				})
 				.catch(next)
 		})
