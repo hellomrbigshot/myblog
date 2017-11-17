@@ -86,7 +86,7 @@ router.get('/:postId/edit', checkLogin, (req, res, next) => {
 	const postId = req.params.postId
 	const author = req.session.user._id
 
-	PostModel.getRawPostById(postId)
+	PostModel.getRowPostById(postId)
 		.then(post => {
 			if (!post) {
 				throw new Error('该文章不存在')
@@ -131,7 +131,7 @@ router.get('/:postId/remove', checkLogin, (req, res, next) => {
 	const postId = req.params.postId
 	const author= req.session.user._id
 
-	PostModel.getRawPostById(postId)
+	PostModel.getRowPostById(postId)
 		.then(post => {
 			if (!post) {
 				throw new Error('文章不存在')
