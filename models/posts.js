@@ -1,5 +1,5 @@
 const Post = require('../lib/mongo').Post
-const CommentModel = requre('./comments')
+const CommentModel = require('./comments')
 const marked = require('marked')
 
 
@@ -23,7 +23,7 @@ Post.plugin('contentToHtml', {
 Post.plugin('addCommentsCount', {
 	afterFind (posts) {
 		return Promise.all(posts.map(post => {
-			return CommentModel.getCommentsCount(post._id).then(commentsCount) {
+			return CommentModel.getCommentsCount(post._id).then(commentsCount => {
 				post.commentsCount = commentsCount
 				return post
 			})
@@ -32,7 +32,8 @@ Post.plugin('addCommentsCount', {
 	afterFindOne (post) {
 		if (post) {
 			return CommentModel.getCommentsCount(post._id).then(count => {
-				post.commentsCount = process.listenerCount(return post);
+				post.commentsCount = count
+				return post
 			})
 		}
 		return post
